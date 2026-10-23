@@ -169,26 +169,28 @@ export function useWeather() {
     );
   }, [loadWeather]);
 
-  // Initial load: Only load default city (London). Geolocation is NOT queried until user clicks.
+  // Initial load: Only load default city once on mount. Geolocation is NOT queried until user clicks.
   useEffect(() => {
     let active = true;
 
     async function initialLoad() {
       try {
+        const initialCity = POPULAR_CITIES[0];
         const data = await fetchWeatherData(
-          currentCity.latitude,
-          currentCity.longitude,
-          currentCity.timezone || 'auto'
+          initialCity.latitude,
+          initialCity.longitude,
+          initialCity.timezone || 'auto'
         );
         if (active) {
           setWeatherData(data);
-          setCurrentCity((prev) => ({
-            ...prev,
-            timezone: data.timezone || prev.timezone,
+          const resolvedCity = {
+            ...initialCity,
+            timezone: data.timezone || initialCity.timezone || 'auto',
             isCurrentLocation: false,
-          }));
+          };
+          setCurrentCity(resolvedCity);
           setLoading(false);
-          saveRecentSearch(currentCity);
+          saveRecentSearch(resolvedCity);
         }
       } catch (err) {
         if (active) {
@@ -204,7 +206,7 @@ export function useWeather() {
     return () => {
       active = false;
     };
-  }, [currentCity, saveRecentSearch]);
+  }, [saveRecentSearch]);
 
   return {
     currentCity,
