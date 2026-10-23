@@ -42,15 +42,21 @@ export function formatPressure(hPa) {
   return `${Math.round(hPa)} hPa`;
 }
 
-export function formatLocalTime(dateStrOrObj, timezone = 'UTC') {
+export function formatLocalTime(dateStrOrObj, timezone = 'UTC', includeSeconds = false) {
   try {
     const date = typeof dateStrOrObj === 'string' ? new Date(dateStrOrObj) : dateStrOrObj;
-    return new Intl.DateTimeFormat('en-US', {
-      timeZone: timezone,
+    const options = {
       hour: 'numeric',
       minute: '2-digit',
       hour12: true,
-    }).format(date);
+    };
+    if (includeSeconds) {
+      options.second = '2-digit';
+    }
+    if (timezone && timezone !== 'auto') {
+      options.timeZone = timezone;
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(date);
   } catch {
     return '--:--';
   }
@@ -59,12 +65,16 @@ export function formatLocalTime(dateStrOrObj, timezone = 'UTC') {
 export function formatLocalDate(dateStrOrObj, timezone = 'UTC') {
   try {
     const date = typeof dateStrOrObj === 'string' ? new Date(dateStrOrObj) : dateStrOrObj;
-    return new Intl.DateTimeFormat('en-US', {
-      timeZone: timezone,
+    const options = {
       weekday: 'long',
-      month: 'short',
+      month: 'long',
       day: 'numeric',
-    }).format(date);
+      year: 'numeric',
+    };
+    if (timezone && timezone !== 'auto') {
+      options.timeZone = timezone;
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(date);
   } catch {
     return '';
   }
@@ -76,10 +86,13 @@ export function formatDayOfWeek(dateStr, timezone = 'UTC', isToday = false) {
     // dateStr in "YYYY-MM-DD"
     const [year, month, day] = dateStr.split('-').map(Number);
     const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
-    return new Intl.DateTimeFormat('en-US', {
-      timeZone: timezone,
+    const options = {
       weekday: 'short',
-    }).format(date);
+    };
+    if (timezone && timezone !== 'auto') {
+      options.timeZone = timezone;
+    }
+    return new Intl.DateTimeFormat('en-US', options).format(date);
   } catch {
     return dateStr;
   }

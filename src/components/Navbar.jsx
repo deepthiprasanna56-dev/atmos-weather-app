@@ -16,14 +16,15 @@ export default function Navbar({
   toggleMotion,
   onDetectLocation,
   loadingLocation,
+  currentCity,
 }) {
   return (
     <header className="sticky top-0 z-30 w-full transition-all duration-300">
-      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-        <nav className="glass-panel flex items-center justify-between gap-2 rounded-2xl px-4 py-2.5 shadow-lg backdrop-blur-xl transition-all">
+      <div className="mx-auto w-full max-w-[1600px] px-2.5 py-3 sm:px-4 md:px-6 lg:px-8">
+        <nav className="glass-panel flex items-center justify-between gap-2 rounded-2xl px-3 py-2.5 shadow-lg backdrop-blur-xl transition-all sm:px-4">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-3">
-            <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-600 text-white shadow-md shadow-sky-500/20">
               <CloudLightning className="h-5 w-5 animate-pulse" />
               <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
@@ -31,11 +32,11 @@ export default function Navbar({
               </span>
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl font-extrabold tracking-tight text-slate-900 dark:text-white">
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white sm:text-xl">
                   Atmos
                 </span>
-                <span className="hidden rounded-full bg-sky-500/10 px-2 py-0.5 text-xs font-semibold text-sky-600 dark:bg-sky-400/15 dark:text-sky-300 sm:inline-block">
+                <span className="rounded-full bg-sky-500/10 px-2 py-0.5 text-[11px] font-semibold text-sky-600 dark:bg-sky-400/15 dark:text-sky-300">
                   Live
                 </span>
               </div>
@@ -46,17 +47,27 @@ export default function Navbar({
           </div>
 
           {/* Action Controls */}
-          <div className="flex items-center gap-1.5 sm:gap-2.5">
-            {/* Geolocation Button */}
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            {/* Geolocation "My Location" Button */}
             <button
               onClick={onDetectLocation}
               disabled={loadingLocation}
-              title="Detect your current location"
+              title="Detect your current location and weather"
               aria-label="Detect current location"
-              className="flex items-center gap-1.5 rounded-xl border border-slate-200/60 bg-white/50 px-3 py-2 text-xs font-semibold text-slate-700 shadow-xs transition-all hover:border-sky-300 hover:bg-sky-50/80 hover:text-sky-600 active:scale-95 disabled:opacity-50 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-sky-400/40 dark:hover:bg-white/10 dark:hover:text-sky-400"
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold shadow-xs transition-all active:scale-95 disabled:opacity-50 ${
+                currentCity?.isCurrentLocation
+                  ? 'border-emerald-500/30 bg-emerald-500/15 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300'
+                  : 'border-slate-200/60 bg-white/50 text-slate-700 hover:border-sky-300 hover:bg-sky-50/80 hover:text-sky-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-sky-400/40 dark:hover:bg-white/10 dark:hover:text-sky-400'
+              }`}
             >
-              <MapPin className={`h-4 w-4 text-sky-500 ${loadingLocation ? 'animate-bounce' : ''}`} />
-              <span className="hidden sm:inline">My Location</span>
+              <MapPin
+                className={`h-4 w-4 ${
+                  currentCity?.isCurrentLocation ? 'text-emerald-500' : 'text-sky-500'
+                } ${loadingLocation ? 'animate-bounce' : ''}`}
+              />
+              <span className="hidden sm:inline">
+                {currentCity?.isCurrentLocation ? 'Current Location' : 'My Location'}
+              </span>
             </button>
 
             {/* Celsius / Fahrenheit Unit Switch */}

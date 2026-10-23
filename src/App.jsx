@@ -72,10 +72,11 @@ export default function App() {
           toggleMotion={toggleMotion}
           onDetectLocation={detectLocation}
           loadingLocation={loading}
+          currentCity={currentCity}
         />
 
         {/* Core Dashboard Content */}
-        <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-8">
+        <main className="mx-auto w-full max-w-[1600px] flex-1 px-2.5 py-4 sm:px-4 md:px-6 lg:px-8 sm:py-6">
           <div className="space-y-6 sm:space-y-8">
             {/* Search Functionality & City Suggestions */}
             <section aria-label="Search city weather">

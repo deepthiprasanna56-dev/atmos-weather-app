@@ -108,8 +108,12 @@ export function useWeather() {
       try {
         const data = await fetchWeatherData(city.latitude, city.longitude, city.timezone || 'auto');
         setWeatherData(data);
-        setCurrentCity(city);
-        saveRecentSearch(city);
+        const resolvedCity = {
+          ...city,
+          timezone: data.timezone || city.timezone || 'auto',
+        };
+        setCurrentCity(resolvedCity);
+        saveRecentSearch(resolvedCity);
       } catch (err) {
         console.error(err);
         setError(`Unable to fetch weather data for ${city.name}. Please check your connection and try again.`);
@@ -141,6 +145,7 @@ export function useWeather() {
             latitude: lat,
             longitude: lon,
             timezone: 'auto',
+            isCurrentLocation: true,
           });
         } catch {
           setError('Failed to fetch weather for your current location.');
@@ -156,11 +161,12 @@ export function useWeather() {
     );
   }, [loadWeather]);
 
-  // Initial load
+  // Initial load: Attempt current location or fallback to default
   useEffect(() => {
     let active = true;
 
-    async function initialFetch() {
+    async function fallbackLoad() {
+      if (!active) return;
       try {
         const data = await fetchWeatherData(
           currentCity.latitude,
@@ -169,19 +175,57 @@ export function useWeather() {
         );
         if (active) {
           setWeatherData(data);
+          setCurrentCity((prev) => ({
+            ...prev,
+            timezone: data.timezone || prev.timezone,
+          }));
           setLoading(false);
           saveRecentSearch(currentCity);
         }
       } catch (err) {
         if (active) {
           console.error(err);
-          setError(`Unable to load weather. Please try searching for a city.`);
+          setError('Unable to load weather. Please try searching for a city.');
           setLoading(false);
         }
       }
     }
 
-    initialFetch();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          if (!active) return;
+          try {
+            const lat = pos.coords.latitude;
+            const lon = pos.coords.longitude;
+            const locInfo = await reverseGeocode(lat, lon);
+            const data = await fetchWeatherData(lat, lon, 'auto');
+            if (active) {
+              const detected = {
+                name: locInfo.name,
+                country: locInfo.country,
+                latitude: lat,
+                longitude: lon,
+                timezone: data.timezone || 'auto',
+                isCurrentLocation: true,
+              };
+              setCurrentCity(detected);
+              setWeatherData(data);
+              setLoading(false);
+              saveRecentSearch(detected);
+            }
+          } catch {
+            fallbackLoad();
+          }
+        },
+        () => {
+          fallbackLoad();
+        },
+        { timeout: 4000, enableHighAccuracy: false }
+      );
+    } else {
+      fallbackLoad();
+    }
 
     return () => {
       active = false;

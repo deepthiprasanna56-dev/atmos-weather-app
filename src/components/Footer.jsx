@@ -3,7 +3,7 @@ import { CloudLightning } from 'lucide-react';
 export default function Footer() {
   return (
     <footer className="mt-16 w-full border-t border-slate-200/50 py-8 backdrop-blur-md dark:border-white/5">
-      <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 text-center text-xs text-slate-500 sm:flex-row sm:px-6 sm:text-left dark:text-slate-400 lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col items-center justify-between gap-4 px-2.5 text-center text-xs text-slate-500 sm:flex-row sm:px-4 md:px-6 lg:px-8 sm:text-left dark:text-slate-400">
         <div className="flex items-center gap-2">
           <div className="flex h-6 w-6 items-center justify-center rounded-lg bg-sky-500 text-white">
             <CloudLightning className="h-3.5 w-3.5" />

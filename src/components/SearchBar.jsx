@@ -98,7 +98,7 @@ export default function SearchBar({
   };
 
   return (
-    <div ref={containerRef} className="relative z-20 mx-auto w-full max-w-3xl">
+    <div ref={containerRef} className="relative z-20 mx-auto w-full max-w-5xl">
       {/* Search Input Container */}
       <form onSubmit={handleSubmit} className="relative">
         <div className="group relative flex items-center rounded-2xl border border-white/50 bg-white/70 shadow-lg backdrop-blur-xl transition-all duration-300 focus-within:border-sky-500 focus-within:ring-4 focus-within:ring-sky-500/20 hover:border-white/80 dark:border-white/10 dark:bg-slate-900/70 dark:focus-within:border-sky-400 dark:focus-within:ring-sky-400/20">
