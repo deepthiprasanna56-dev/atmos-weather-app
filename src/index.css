@@ -14,6 +14,8 @@
     width: 100%;
     min-height: 100%;
     overflow-x: hidden;
+    scrollbar-width: none; /* Modern standard: Firefox, Chrome 121+, Safari 18.2+, Edge */
+    -ms-overflow-style: none; /* IE and older Edge */
   }
 
   :root {
@@ -35,6 +37,32 @@
   :root:has(> head > meta[name="color-scheme"][content="light"]) {
     color-scheme: light;
   }
+}
+
+/* Hide scrollbar completely while maintaining full scrollability */
+html,
+body,
+* {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: transparent !important;
+}
+
+.no-scrollbar {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 /* Glassmorphism utilities */
@@ -64,30 +92,6 @@
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-/* Custom smooth scrollbar */
-.custom-scrollbar::-webkit-scrollbar {
-  height: 6px;
-  width: 6px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 9999px;
-}
-
-.dark .custom-scrollbar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(148, 163, 184, 0.4);
-  border-radius: 9999px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.7);
 }
 
 /* Pulse glow keyframe */

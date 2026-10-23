@@ -54,7 +54,7 @@ export default function HourlyForecast({ hourly = [], timezone, unit }) {
       {/* Horizontal Carousel */}
       <div
         ref={scrollRef}
-        className="custom-scrollbar flex gap-3 overflow-x-auto pb-2 scroll-smooth"
+        className="no-scrollbar flex gap-3 overflow-x-auto pb-1 scroll-smooth"
       >
         {hourly.map((item, idx) => {
           const isNow = idx === 0;
