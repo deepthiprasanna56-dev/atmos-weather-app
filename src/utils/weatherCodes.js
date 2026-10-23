@@ -92,7 +92,7 @@ export const WEATHER_CONDITIONS = {
     nightIcon: 'CloudHail',
     dayBg: 'from-cyan-400 via-blue-400 to-slate-500',
     nightBg: 'from-slate-950 via-cyan-950 to-blue-950',
-    particle: 'snow',
+    particle: 'rain',
   },
   57: {
     description: 'Dense Freezing Drizzle',
@@ -101,7 +101,7 @@ export const WEATHER_CONDITIONS = {
     nightIcon: 'CloudHail',
     dayBg: 'from-cyan-500 via-blue-500 to-slate-600',
     nightBg: 'from-slate-950 via-cyan-950 to-blue-950',
-    particle: 'snow',
+    particle: 'rain',
   },
   61: {
     description: 'Slight Rain',
@@ -137,7 +137,7 @@ export const WEATHER_CONDITIONS = {
     nightIcon: 'CloudHail',
     dayBg: 'from-cyan-500 via-slate-600 to-blue-800',
     nightBg: 'from-slate-950 via-cyan-950 to-slate-900',
-    particle: 'snow',
+    particle: 'rain',
   },
   67: {
     description: 'Heavy Freezing Rain',
@@ -146,7 +146,7 @@ export const WEATHER_CONDITIONS = {
     nightIcon: 'CloudHail',
     dayBg: 'from-cyan-600 via-slate-700 to-blue-900',
     nightBg: 'from-slate-950 via-cyan-950 to-zinc-950',
-    particle: 'snow',
+    particle: 'rain',
   },
   71: {
     description: 'Slight Snow',
@@ -258,7 +258,7 @@ export const WEATHER_CONDITIONS = {
   },
 };
 
-export function getWeatherDetails(code, isDay = 1) {
+export function getWeatherDetails(code, isDay = 1, precipitation = 0) {
   const condition = WEATHER_CONDITIONS[code] || {
     description: 'Variable Conditions',
     type: 'partly_cloudy',
@@ -273,10 +273,14 @@ export function getWeatherDetails(code, isDay = 1) {
   const iconName = isNight ? condition.nightIcon : condition.dayIcon;
   const gradient = isNight ? condition.nightBg : condition.dayBg;
   
-  // For night clear sky or partly cloudy, particle can be stars
   let particle = condition.particle;
   if (isNight && (condition.type === 'clear' || condition.type === 'partly_cloudy')) {
     particle = 'stars';
+  }
+
+  // Active rainfall override if precipitation > 0
+  if (precipitation > 0 && condition.type !== 'snow') {
+    particle = 'rain';
   }
 
   return {

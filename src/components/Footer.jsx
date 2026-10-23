@@ -12,17 +12,7 @@ export default function Footer() {
             Atmos Weather
           </span>
           <span>•</span>
-          <span>
-            Meteorological data provided by{' '}
-            <a
-              href="https://open-meteo.com"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium text-sky-600 underline underline-offset-2 hover:text-sky-500 dark:text-sky-400"
-            >
-              Open-Meteo
-            </a>
-          </span>
+          <span>Real-time atmospheric insights</span>
         </div>
 
         <div className="flex items-center gap-4">

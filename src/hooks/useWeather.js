@@ -7,7 +7,10 @@ const UNIT_KEY = 'atmos_temp_unit';
 const MOTION_KEY = 'atmos_reduced_motion';
 
 export function useWeather() {
-  const [currentCity, setCurrentCity] = useState(POPULAR_CITIES[0]); // Default to London
+  const [currentCity, setCurrentCity] = useState({
+    ...POPULAR_CITIES[0],
+    isCurrentLocation: false,
+  }); // Default to London (not current location)
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -102,7 +105,7 @@ export function useWeather() {
   }, []);
 
   const loadWeather = useCallback(
-    async (city) => {
+    async (city, isFromGeo = false) => {
       setLoading(true);
       setError(null);
       try {
@@ -111,6 +114,7 @@ export function useWeather() {
         const resolvedCity = {
           ...city,
           timezone: data.timezone || city.timezone || 'auto',
+          isCurrentLocation: isFromGeo || Boolean(city.isCurrentLocation),
         };
         setCurrentCity(resolvedCity);
         saveRecentSearch(resolvedCity);
@@ -124,6 +128,7 @@ export function useWeather() {
     [saveRecentSearch]
   );
 
+  // ONLY triggered when user clicks the "My Location" button
   const detectLocation = useCallback(() => {
     if (!navigator.geolocation) {
       setError('Geolocation is not supported by your browser.');
@@ -139,14 +144,17 @@ export function useWeather() {
           const lat = pos.coords.latitude;
           const lon = pos.coords.longitude;
           const locInfo = await reverseGeocode(lat, lon);
-          await loadWeather({
-            name: locInfo.name,
-            country: locInfo.country,
-            latitude: lat,
-            longitude: lon,
-            timezone: 'auto',
-            isCurrentLocation: true,
-          });
+          await loadWeather(
+            {
+              name: locInfo.name,
+              country: locInfo.country,
+              latitude: lat,
+              longitude: lon,
+              timezone: 'auto',
+              isCurrentLocation: true,
+            },
+            true
+          );
         } catch {
           setError('Failed to fetch weather for your current location.');
           setLoading(false);
@@ -154,19 +162,18 @@ export function useWeather() {
       },
       (err) => {
         console.warn('Geolocation denied or error:', err.message);
-        setError('Location permission denied or unavailable. Showing default city.');
+        setError('Location permission denied or unavailable. Showing current city.');
         setLoading(false);
       },
       { timeout: 10000, enableHighAccuracy: false }
     );
   }, [loadWeather]);
 
-  // Initial load: Attempt current location or fallback to default
+  // Initial load: Only load default city (London). Geolocation is NOT queried until user clicks.
   useEffect(() => {
     let active = true;
 
-    async function fallbackLoad() {
-      if (!active) return;
+    async function initialLoad() {
       try {
         const data = await fetchWeatherData(
           currentCity.latitude,
@@ -178,6 +185,7 @@ export function useWeather() {
           setCurrentCity((prev) => ({
             ...prev,
             timezone: data.timezone || prev.timezone,
+            isCurrentLocation: false,
           }));
           setLoading(false);
           saveRecentSearch(currentCity);
@@ -191,41 +199,7 @@ export function useWeather() {
       }
     }
 
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (pos) => {
-          if (!active) return;
-          try {
-            const lat = pos.coords.latitude;
-            const lon = pos.coords.longitude;
-            const locInfo = await reverseGeocode(lat, lon);
-            const data = await fetchWeatherData(lat, lon, 'auto');
-            if (active) {
-              const detected = {
-                name: locInfo.name,
-                country: locInfo.country,
-                latitude: lat,
-                longitude: lon,
-                timezone: data.timezone || 'auto',
-                isCurrentLocation: true,
-              };
-              setCurrentCity(detected);
-              setWeatherData(data);
-              setLoading(false);
-              saveRecentSearch(detected);
-            }
-          } catch {
-            fallbackLoad();
-          }
-        },
-        () => {
-          fallbackLoad();
-        },
-        { timeout: 4000, enableHighAccuracy: false }
-      );
-    } else {
-      fallbackLoad();
-    }
+    initialLoad();
 
     return () => {
       active = false;
